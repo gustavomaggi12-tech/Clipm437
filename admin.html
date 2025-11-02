@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Admin – Logs</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Logs recebidos</h1>
+  <table id="logs">
+    <thead>
+      <tr>
+        <th>IP</th><th>Cidade</th><th>Screen</th><th>Canvas Hash</th>
+        <th>Screenshot</th><th>TS</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    /* Substitua pela URL do seu Google Apps Script que devolve JSON */
+    const API_URL = 'https://script.google.com/macros/s/SEU_GAS/exec';
+
+    async function load() {
+      const res = await fetch(API_URL);
+      const rows = await res.json();
+      const tbody = document.querySelector('#logs tbody');
+      tbody.innerHTML = '';
+      rows.reverse().forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.ip}</td>
+          <td>${r.city || '-'}</td>
+          <td>${r.screen}</td>
+          <td><code>${r.canvasHash.slice(0,16)}…</code></td>
+          <td>
+            <a href="${r.screenshot}" download="ss.jpg">
+              <img src="${r.screenshot}" width="80" alt="ss">
+            </a>
+          </td>
+          <td>${new Date(r.ts).toLocaleString('pt-BR')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    load();
+  </script>
+</body>
+</html>
